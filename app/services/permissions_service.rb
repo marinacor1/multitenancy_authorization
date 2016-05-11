@@ -7,28 +7,45 @@ class PermissionsService
 
   def allow?
     if user.platform_admin?
-      return true if controller = "sessions"
-      return true if controller == "items" && action.in?(%w( index show))
-      return true if controller == "orders" && action.in?(%w( index show))
-      return true if controller == "users" && action.in?(%w( index show))
-      return true if controller == "stores" && action.in?(%w( index show))
+       platform_admin_permissions
     elsif user.store_admin?
-      return true if controller == "items" && action.in?(%w( index show))
-      return true if controller == "orders" && action.in?(%w( index show))
-      return true if controller == "stores" && action.in?(%w( index show))
+       store_admin_permissions
     elsif user.registered_user?
-      return true if controller == "items" && action.in?(%w( index show))
-      return true if controller == "stores" && action.in?(%w( index show))
-      return true if controller == "orders" && action.in?(%w( show))
+      registered_user_permissions
     else
-      return true if controller == "stores" && action == "index"
-      return true if controller == "sessions" && action == "new"
-      return true if controller == "sessions" && action == "create"
-      return true if controller == "sessions" && action == "destroy"
+      unregistered_guest_permissions
     end
   end
 
   private
+
+  def platform_admin_permissions
+    return true if controller = "sessions"
+    return true if controller == "items" && action.in?(%w( index show))
+    return true if controller == "orders" && action.in?(%w( index show))
+    return true if controller == "users" && action.in?(%w( index show))
+    return true if controller == "stores" && action.in?(%w( index show))
+  end
+
+  def store_admin_permissions
+    return true if controller = "sessions"
+    return true if controller == "items" && action.in?(%w( index show))
+    return true if controller == "orders" && action.in?(%w( index show))
+    return true if controller == "stores" && action.in?(%w( index show))
+  end
+
+  def registered_user_permissions
+    return true if controller = "sessions"
+    return true if controller == "items" && action.in?(%w( index show))
+    return true if controller == "stores" && action.in?(%w( index show))
+  end
+
+  def unregistered_guest_permissions
+    return true if controller == "stores" && action == "index"
+    return true if controller == "sessions" && action == "new"
+    return true if controller == "sessions" && action == "create"
+    return true if controller == "sessions" && action == "destroy"
+  end
 
   def controller
     @_controller
